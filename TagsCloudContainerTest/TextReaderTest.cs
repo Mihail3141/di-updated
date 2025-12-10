@@ -3,7 +3,7 @@ using FluentAssertions;
 
 namespace TagsCloudContainerTest;
 
-public class Tests
+public class TagsCloudContainerTest
 {
     private Reader _reader;
     
@@ -51,5 +51,15 @@ public class Tests
         var words = _reader.GetWordsFromFile(filePath);
         
         words.Should().HaveCount(82516);
+    }
+    
+    [Test]
+    public void RuHarryPotterTest()
+    {
+        var filePath = Path.Combine("..", "..", "..", "TestFiles", "Гарри Поттер и философский камень.txt");
+
+        var words = _reader.GetWordsFromFile(filePath);
+        
+        words.Should().HaveCount(63922);
     }
 }
