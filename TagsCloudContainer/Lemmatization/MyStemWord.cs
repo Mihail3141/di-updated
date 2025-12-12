@@ -1,4 +1,4 @@
-﻿namespace TagsCloudContainer.WordProcess;
+﻿namespace TagsCloudContainer.Lemmatization;
 
 public class MyStemWord
 {

@@ -1,9 +1,9 @@
 ﻿using System.Drawing;
 using Autofac;
+using TagsCloudContainer.Lemmatization;
 using TagsCloudContainer.TagBuilder;
 using TagsCloudContainer.TagsCloudVisualization.Render;
 using TagsCloudContainer.TextReader;
-using TagsCloudContainer.WordProcess;
 using TagsCloudVisualization.CircularCloudLayouter;
 using TagsCloudVisualization.PointGenerator;
 
@@ -15,7 +15,7 @@ public static class Program
     {
         var builder = new ContainerBuilder();
         var center = new Point(1920 / 2, 1080 / 2);
-        builder.RegisterType<Reader>().AsSelf().SingleInstance();
+        builder.RegisterType<TextFileProcessor>().AsSelf().SingleInstance();
         builder.Register(ctx =>
             new WordProcessor());
         builder.Register(ctx =>
@@ -45,7 +45,7 @@ public static class Program
         var container = CreateContainer();
         using var scope = container.BeginLifetimeScope();
         
-        var reader = scope.Resolve<Reader>();
+        var reader = scope.Resolve<TextFileProcessor>();
         var wordProcessor = scope.Resolve<WordProcessor>();
         var builder = scope.Resolve<ITagCloudBuilder>();
         var renderer = scope.Resolve<ICloudRenderer>();

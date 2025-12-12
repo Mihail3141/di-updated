@@ -1,9 +1,9 @@
 ﻿using FluentAssertions;
-using TagsCloudContainer.WordProcess;
+using TagsCloudContainer.Lemmatization;
 
 namespace TagsCloudContainerTest;
 
-public class WordProcessorTest
+public class LemmatizationTest
 {
     private WordProcessor wordProcessor;
     private List<string> words;
@@ -13,10 +13,7 @@ public class WordProcessorTest
     {
         wordProcessor = new WordProcessor();
 
-        words =
-        [
-            "красивые", "маме", "в", "под", "рамой", "мыла", "и", "он",
-        ];
+        words = ["красивые", "маме", "в", "под", "рамой", "мыла", "и", "он",];
     }
 
     [Test]
@@ -36,6 +33,19 @@ public class WordProcessorTest
 
     [Test]
     public void ProcessWords_ShouldExcludeSpecificWords_WhenConfigured()
+    {
+        var result = wordProcessor
+            .AddWordFilter(word => word.Lemma[0] == 'м')
+            .Get(words);
+
+        result.Should().Contain("мама");
+        result.Should().Contain("мыло");
+        result.Should().NotContain("рама");
+        result.Should().NotContain("красивый");
+    }
+    
+    [Test]
+    public void ProcessWords_ShouldExcludeSpecificWordsФ_WhenConfigured()
     {
         var result = wordProcessor
             .SetAllowedPartsOfSpeech(["S"])

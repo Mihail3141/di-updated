@@ -1,6 +1,6 @@
 ﻿namespace TagsCloudContainer.TextReader;
 
-public class Reader
+public class TextFileProcessor
 {
     private static readonly char[] WordDelimiters =
     [

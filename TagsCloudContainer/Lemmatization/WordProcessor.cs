@@ -1,12 +1,13 @@
-﻿namespace TagsCloudContainer.WordProcess;
+﻿namespace TagsCloudContainer.Lemmatization;
 
 public class WordProcessor
 {
     private readonly MyStemAnalyzer _analyzer = new(Path.Combine(AppContext.BaseDirectory, "mystem.exe"));
 
-    private HashSet<string> _allowedPartsOfSpeech = new(StringComparer.OrdinalIgnoreCase) { "S", "A", };
+    private HashSet<string> _allowedPartsOfSpeech = new(StringComparer.OrdinalIgnoreCase) { "S", "A", "V"};
     private HashSet<string> _excludedWords = new(StringComparer.OrdinalIgnoreCase);
     private readonly List<Func<MyStemWord, bool>> _filters = [];
+
     public WordProcessor SetAllowedPartsOfSpeech(IEnumerable<string> allowedPartsOfSpeech)
     {
         _allowedPartsOfSpeech = allowedPartsOfSpeech.ToHashSet();
@@ -18,7 +19,7 @@ public class WordProcessor
         _excludedWords = excludedWords.ToHashSet();
         return this;
     }
-    
+
     public WordProcessor AddWordFilter(Func<MyStemWord, bool> filter)
     {
         _filters.Add(filter ?? throw new ArgumentNullException(nameof(filter)));
@@ -46,7 +47,7 @@ public class WordProcessor
         return allAnalysis
             .Where(w => _allowedPartsOfSpeech.Contains(w.Pos))
             .Where(word => !_excludedWords.Contains(word.Lemma.ToLowerInvariant()))
-            .Where(word => _filters.Count == 0 ||  _filters.All(filter => filter(word)))
+            .Where(word => _filters.Count == 0 || _filters.All(filter => filter(word)))
             .Select(w => w.Lemma.ToLowerInvariant())
             .ToList();
     }

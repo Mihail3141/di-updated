@@ -5,12 +5,12 @@ namespace TagsCloudContainerTest;
 
 public class TagsTextReaderTest
 {
-    private Reader _reader;
+    private TextFileProcessor _textFileProcessor;
     
     [SetUp]
     public void Setup()
     {
-        _reader = new Reader();
+        _textFileProcessor = new TextFileProcessor();
     }
 
     [Test]
@@ -18,7 +18,7 @@ public class TagsTextReaderTest
     {
         var filePath = Path.Combine("..", "..", "..", "TestFiles", "txtTest.txt");
 
-        var words = _reader.GetWordsFromFile(filePath);
+        var words = _textFileProcessor.GetWordsFromFile(filePath);
         
         words.Should().HaveCount(19);
     }
@@ -28,7 +28,7 @@ public class TagsTextReaderTest
     {
         var filePath = Path.Combine("..", "..", "..", "TestFiles", "docxTest.docx");
 
-        var words = _reader.GetWordsFromFile(filePath);
+        var words = _textFileProcessor.GetWordsFromFile(filePath);
         
         words.Should().HaveCount(19);
     }
@@ -38,7 +38,7 @@ public class TagsTextReaderTest
     {
         var filePath = Path.Combine("..", "..", "..", "TestFiles", "docTest.doc");
 
-        var words = _reader.GetWordsFromFile(filePath);
+        var words = _textFileProcessor.GetWordsFromFile(filePath);
         
         words.Should().HaveCount(19);
     }
@@ -48,7 +48,7 @@ public class TagsTextReaderTest
     {
         var filePath = Path.Combine("..", "..", "..", "TestFiles", "HarryPotterText.txt");
 
-        var words = _reader.GetWordsFromFile(filePath);
+        var words = _textFileProcessor.GetWordsFromFile(filePath);
         
         words.Should().HaveCount(82516);
     }
@@ -58,7 +58,7 @@ public class TagsTextReaderTest
     {
         var filePath = Path.Combine("..", "..", "..", "TestFiles", "Гарри Поттер и философский камень.txt");
 
-        var words = _reader.GetWordsFromFile(filePath);
+        var words = _textFileProcessor.GetWordsFromFile(filePath);
         
         words.Should().HaveCount(63922);
     }

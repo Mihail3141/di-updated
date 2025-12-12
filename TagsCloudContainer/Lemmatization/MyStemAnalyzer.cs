@@ -3,7 +3,8 @@ using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
 
-namespace TagsCloudContainer.WordProcess;
+
+namespace TagsCloudContainer.Lemmatization;
 
 public class MyStemAnalyzer
 {
