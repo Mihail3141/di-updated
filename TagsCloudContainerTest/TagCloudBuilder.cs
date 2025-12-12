@@ -51,7 +51,7 @@ public class TagCloudBuilderTest
     }
 
     [Test]
-    public void Test22()
+    public void BuildTagCloud_ShouldThrowArgumentException_WhenCountLessZero()
     {
         var act = () => _builder.BuildTagCloud(-1, _frequency, 10, 100);
 

@@ -8,7 +8,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="ProcessedFile\" />
       <Folder Include="TagsCloudVisualization\" />
     </ItemGroup>
 

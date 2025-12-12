@@ -1,8 +1,8 @@
 ﻿using System.Drawing;
 
-namespace TagsCloudVisualization;
+namespace TagsCloudContainer.TagsCloudVisualization.Render;
 
 public interface ICloudRenderer
 {
-    public Bitmap CreateRectangleCloud(IEnumerable<Rectangle> rectangles);
+    public Bitmap CreateRectangleCloud(IEnumerable<Tag> tags);
 }

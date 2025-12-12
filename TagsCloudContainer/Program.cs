@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
 using TagsCloudContainer.TagBuilder;
+using TagsCloudContainer.TagsCloudVisualization.Render;
 using TagsCloudContainer.TextReader;
 using TagsCloudContainer.WordProcess;
 using TagsCloudVisualization;
@@ -12,36 +13,43 @@ public static class Program
     private static void Main()
     {
         var reader = new Reader();
-        //var wordProcessor = new WordProcessor(Path.Combine(AppContext.BaseDirectory, "mystem.exe"));
+        var wordProcessor = new WordProcessor();
 
-        var sourceFilePath = Path.Combine("..", "..", "..", "SourceFile", "lemmas.txt");
+        var sourceFilePath = Path.Combine("..", "..", "..", "SourceFile", "ГарриПоттерНаРусском.txt");
+        
+        var wordsFromText = reader.GetWordsFromFile(sourceFilePath);
+        var processedWords = wordProcessor
+            .SetAllowedPartsOfSpeech(["S","V"])
+            .ExcludeWords(["быть"])
+            .AddWordFilter(word => word.Lemma.Length > 2)
+            .Get(wordsFromText);
 
-        var words = reader.GetWordsFromFile(sourceFilePath);
-
-        var frequency = words
-            .GroupBy(w => w)
-            .ToDictionary(g => g.Key, g => g.Count());
-
-        //var result = wordProcessor.ProcessWords(words);
         // var sourceFileDir = Path.GetDirectoryName(sourceFilePath) ?? "SourceFile";
         // var saver = new LemmasSaver(sourceFileDir);
         // saver.SaveLemmas(result);
-        // var frequency = result
-        //     .GroupBy(w => w)
-        //     .ToDictionary(g => g.Key, g => g.Count());
-        //
-
+        
+        var frequency = processedWords
+            .GroupBy(w => w)
+            .ToDictionary(g => g.Key, g => g.Count());
+        
+        
         var center = new Point(1920 / 2, 1080 / 2);
-        var pointGenerator = new SpiralPointGenerator(center, 1.1, double.Pi / 30);
+        var pointGenerator = new SpiralPointGenerator(center, 1, double.Pi / 24);
         var layouter = new CircularCloudLayouter(center, 20000, pointGenerator);
 
         var builder = new TagCloudBuilder(layouter);
-        var taggedRects = builder.BuildTagCloud(120, frequency, 15, 160);
+        var tags = builder.BuildTagCloud(100, frequency, 5, 120);
 
+        var settings = new TagCloudRenderSettings
+        {
+            ImageSize = new Size(1920, 1080),
+            FontName = "Arial",
+            FontStyle = FontStyle.Italic,
+            FontSizeMultiplier = 0.5f 
+        };
+        var renderer = new TagCloudRenderer(settings);
 
-        var renderer = new TagCloudRenderer(new Size(1920, 1080));
-
-        using var bitmap = renderer.CreateRectangleCloud(taggedRects);
+        using var bitmap = renderer.CreateRectangleCloud(tags);
         bitmap.Save("tagcloud.png", System.Drawing.Imaging.ImageFormat.Png);
         Console.WriteLine("Облако сохранено: tagcloud.png");
     }

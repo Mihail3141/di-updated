@@ -11,30 +11,41 @@ public class WordProcessorTest
     [SetUp]
     public void Setup()
     {
-        var mystemPath = Path.Combine(AppContext.BaseDirectory, "mystem.exe");
-
-        wordProcessor = new WordProcessor(mystemPath);
+        wordProcessor = new WordProcessor();
 
         words =
         [
-            "красивые", "маме", "в", "под", "рамой", "мыла", "и", "он", 
+            "красивые", "маме", "в", "под", "рамой", "мыла", "и", "он",
         ];
     }
 
     [Test]
-    public void ВсеСловаКНачальнойФорме()
+    public void ProcessWords_ShouldReturnLemmasInBaseForm_WhenGivenMixedInput()
     {
-        var result = wordProcessor.ProcessWords(words);
+        var result = wordProcessor.Get(words);
 
         result.Should().Contain("красивый");
         result.Should().Contain("мама");
         result.Should().Contain("рама");
-  
-        
-        result.Should().NotContain("в");
-        result.Should().NotContain("под");
-        result.Should().NotContain("и");
-        result.Should().NotContain("он");
-        
+
+
+        result.Should().NotContain("красивые");
+        result.Should().NotContain("маме");
+        result.Should().NotContain("рамой");
+    }
+
+    [Test]
+    public void ProcessWords_ShouldExcludeSpecificWords_WhenConfigured()
+    {
+        var result = wordProcessor
+            .SetAllowedPartsOfSpeech(["S"])
+            .ExcludeWords(["рама"])
+            .Get(words);
+
+        result.Should().Contain("мама");
+        result.Should().NotContain("рама");
+        result.Should().NotContain("раму");
+        result.Should().NotContain("красивый");
+        result.Should().NotContain("красивые");
     }
 }

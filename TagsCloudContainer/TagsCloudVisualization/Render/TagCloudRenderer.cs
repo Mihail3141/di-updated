@@ -1,44 +1,43 @@
 ﻿using System.Drawing;
-using System.Drawing.Text;
 using System.Drawing.Drawing2D;
+using System.Drawing.Text;
 
-namespace TagsCloudVisualization;
+namespace TagsCloudContainer.TagsCloudVisualization.Render;
 
-public class TagCloudRenderer(Size imageSize) 
+public class TagCloudRenderer : ICloudRenderer
 {
-    private readonly Brush _backgroundBrush = new SolidBrush(Color.FromArgb(0, 34, 43));
-    private readonly Brush _textBrush = new SolidBrush(Color.FromArgb(212, 85, 0)); 
+    private readonly TagCloudRenderSettings _settings;
 
-    public Bitmap CreateRectangleCloud(IEnumerable<(Rectangle rect, string word)> taggedRectangles)
+    public TagCloudRenderer(TagCloudRenderSettings settings)
     {
-        var bitmap = new Bitmap(imageSize.Width, imageSize.Height);
-        
+        _settings = settings;
+    }
+    public Bitmap CreateRectangleCloud(IEnumerable<Tag> tags)
+    {
+        var bitmap = new Bitmap(_settings.ImageSize.Width, _settings.ImageSize.Height);
+
         using var graphics = Graphics.FromImage(bitmap);
-        
-  
+
         graphics.TextRenderingHint = TextRenderingHint.AntiAlias;
         graphics.SmoothingMode = SmoothingMode.AntiAlias;
         
+        using var bgBrush = new SolidBrush(_settings.BackgroundColor);
+        graphics.FillRectangle(bgBrush, 0, 0, _settings.ImageSize.Width, _settings.ImageSize.Height);
 
-        graphics.FillRectangle(_backgroundBrush, 0, 0, imageSize.Width, imageSize.Height);
-        
-        foreach (var (rect, word) in taggedRectangles)
+        foreach (var tag in tags)
         {
-   
-            var fontSize = Math.Max(10, rect.Height / 2);
-            var font = new Font("Segoe UI", fontSize, FontStyle.Bold);
+            var fontSize = tag.rect.Height * _settings.FontSizeMultiplier;
+            var font = new Font(_settings.FontName, fontSize, _settings.FontStyle);
             
-  
-            var stringSize = graphics.MeasureString(word, font);
-            var textX = rect.X + (rect.Width - stringSize.Width) / 2;
-            var textY = rect.Y + (rect.Height - stringSize.Height) / 2;
+            var textSize = graphics.MeasureString(tag.word, font);
+            var textX = tag.rect.X + (tag.rect.Width - textSize.Width) / 2;
+            var textY = tag.rect.Y + (tag.rect.Height - textSize.Height) / 2;
             
-
-            graphics.DrawString(word, font, _textBrush, textX, textY);
-            
+            using var textBrush = new SolidBrush(_settings.TextColor);
+            graphics.DrawString(tag.word, font, textBrush, textX, textY);
             font.Dispose();
         }
-        
+
         return bitmap;
     }
 }

@@ -1,6 +1,5 @@
 using TagsCloudContainer.TextReader;
 using FluentAssertions;
-using TagsCloudContainer.TagBuilder;
 
 namespace TagsCloudContainerTest;
 
@@ -15,7 +14,7 @@ public class TagsTextReaderTest
     }
 
     [Test]
-    public void TxtTest()
+    public void GetWordsFromFile_ShouldReadAllWords_WhenTxtFileProvided()
     {
         var filePath = Path.Combine("..", "..", "..", "TestFiles", "txtTest.txt");
 
@@ -25,7 +24,7 @@ public class TagsTextReaderTest
     }
     
     [Test]
-    public void DocxTest()
+    public void GetWordsFromFile_ShouldReadAllWords_WhenDocxFileProvided()
     {
         var filePath = Path.Combine("..", "..", "..", "TestFiles", "docxTest.docx");
 
@@ -35,7 +34,7 @@ public class TagsTextReaderTest
     }
     
     [Test]
-    public void DocTest()
+    public void GetWordsFromFile_ShouldReadAllWords_WhenDocFileProvided()
     {
         var filePath = Path.Combine("..", "..", "..", "TestFiles", "docTest.doc");
 
@@ -45,7 +44,7 @@ public class TagsTextReaderTest
     }
     
     [Test]
-    public void HarryPotterTest()
+    public void GetWordsFromFile_ShouldReadAllWords_WhenLargeEnglishTextProvided()
     {
         var filePath = Path.Combine("..", "..", "..", "TestFiles", "HarryPotterText.txt");
 
@@ -55,7 +54,7 @@ public class TagsTextReaderTest
     }
     
     [Test]
-    public void RuHarryPotterTest()
+    public void GetWordsFromFile_ShouldReadAllWords_WhenLargeRussianTextProvided()
     {
         var filePath = Path.Combine("..", "..", "..", "TestFiles", "Гарри Поттер и философский камень.txt");
 
