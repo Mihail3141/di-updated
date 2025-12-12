@@ -1,9 +1,10 @@
 using TagsCloudContainer.TextReader;
 using FluentAssertions;
+using TagsCloudContainer.TagBuilder;
 
 namespace TagsCloudContainerTest;
 
-public class TagsCloudContainerTest
+public class TagsTextReaderTest
 {
     private Reader _reader;
     

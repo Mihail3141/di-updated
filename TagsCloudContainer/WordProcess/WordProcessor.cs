@@ -14,7 +14,7 @@ public class WordProcessor
         "PR", "CONJ", "CCONJ", "INTJ", "P", "ADV-PRON", "PRED", "PART", "A-PRON",
     };
 
-    private HashSet<string> _allowedPos = new(StringComparer.OrdinalIgnoreCase) { "S", "A", "V" };
+    private HashSet<string> _allowedPos = new(StringComparer.OrdinalIgnoreCase) { "S", "A",  };
 
     public WordProcessor(string systemPath)
     {
