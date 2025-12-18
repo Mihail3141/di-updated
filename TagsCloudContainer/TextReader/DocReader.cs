@@ -16,4 +16,7 @@ public class DocReader : ITextReader
             .Skip(1)
             .ToList();
     }
+    
+    public bool CanRead(string pathToFile) 
+        => Path.GetExtension(pathToFile) is ".doc" or ".docx";
 }

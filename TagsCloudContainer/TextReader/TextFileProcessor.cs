@@ -2,7 +2,7 @@
 
 namespace TagsCloudContainer.TextReader;
 
-public partial class TextFileProcessor
+public partial class TextFileProcessor(IEnumerable<ITextReader> textReaders)
 {
     private static readonly char[] WordDelimiters =
     [
@@ -11,13 +11,6 @@ public partial class TextFileProcessor
         '-', '–', '—', '/', '\\'
     ];
 
-    private static readonly Dictionary<string, ITextReader> TextReaders = new(StringComparer.OrdinalIgnoreCase)
-    {
-        [".txt"] = new TxtReader(),
-        [".doc"] = new DocReader(),
-        [".docx"] = new DocReader(),
-    };
-    
     private static readonly Regex WordNormalizer = MyRegex();
 
     public List<string> GetWordsFromFile(string pathToFile)
@@ -25,9 +18,8 @@ public partial class TextFileProcessor
         if (!File.Exists(pathToFile))
             throw new FileNotFoundException("File not found", pathToFile);
 
-        var extension = Path.GetExtension(pathToFile);
-        if (!TextReaders.TryGetValue(extension, out var reader))
-            throw new FileNotFoundException($"File format {extension} is not specified", pathToFile);
+        var reader = textReaders.FirstOrDefault(r => r.CanRead(pathToFile))
+                     ?? throw new FileNotFoundException($"No reader for {Path.GetExtension(pathToFile)}");
 
         var lines = reader.ReadTextLines(pathToFile);
 
@@ -37,7 +29,7 @@ public partial class TextFileProcessor
             .Select(word => WordNormalizer.Replace(word, "").ToLowerInvariant())
             .ToList();
     }
-
+    
     [GeneratedRegex(@"[^\p{L}]+", RegexOptions.Compiled)]
     private static partial Regex MyRegex();
 }

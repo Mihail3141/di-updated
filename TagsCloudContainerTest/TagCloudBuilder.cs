@@ -28,13 +28,13 @@ public class TagCloudBuilderTest
             ["гермиона"] = 200,
             ["рон"] = 200
         };
-        _builder = new TagCloudBuilder(_layouter);
+        _builder = new TagCloudBuilder(_layouter, new TagCloudSettings());
     }
 
     [Test]
     public void BuildTagCloud_ShouldReturnCorrectCount_WhenValidParameters()
     {
-        var result = _builder.BuildTagCloud(3, _frequency);
+        var result = _builder.GetTagCloud(_frequency, 3);
 
         result.Should().HaveCount(3);
         result[0].word.Should().Be("гарри");
@@ -45,7 +45,7 @@ public class TagCloudBuilderTest
     [Test]
     public void BuildTagCloud_ShouldThrowArgumentException_WhenMaxFontSizeLessThanMin()
     {
-        var act = () => _builder.BuildTagCloud(3, _frequency, 20, 10);
+        var act = () => _builder.GetTagCloud(_frequency, 3, 20, 10);
 
         act.Should().Throw<ArgumentException>()
             .WithMessage("maxFontSize must be greater than minFontSize");
@@ -54,16 +54,24 @@ public class TagCloudBuilderTest
     [Test]
     public void BuildTagCloud_ShouldThrowArgumentException_WhenCountLessZero()
     {
-        var act = () => _builder.BuildTagCloud(-1, _frequency, 10, 100);
+        var act = () => _builder.GetTagCloud(_frequency, -1, 10, 100);
 
         act.Should().Throw<ArgumentException>()
-            .WithMessage("tagCount must be greater than zero");
+            .WithMessage("tagCount must be greater than or equal to zero");
+    }
+    
+    [Test]
+    public void BuildTagCloud_ShouldUseAllWords_WhenTagCountNotSpecified()
+    {
+        var result = _builder.GetTagCloud(_frequency);
+
+        result.Should().HaveCount(_frequency.Count);
     }
 
     [Test]
     public void BuildTagCloud_ShouldHaveLargerRectanglesForMoreFrequentWords_WhenDifferentFrequencies()
     {
-        var result = _builder.BuildTagCloud(3, _frequency, 10, 100);
+        var result = _builder.GetTagCloud(_frequency, 3, 10, 100);
 
         var size1 = result[0].rect.Size;
         var size2 = result[1].rect.Size;
@@ -78,7 +86,7 @@ public class TagCloudBuilderTest
     {
         var sameFreq = new Dictionary<string, int> { ["слово1"] = 100, ["слово2"] = 100 };
 
-        var result = _builder.BuildTagCloud(2, sameFreq, 10, 500);
+        var result = _builder.GetTagCloud(sameFreq, 2, 10, 500);
 
         result[0].rect.Width.Should().Be(result[1].rect.Width);
         result[0].rect.Height.Should().Be(result[1].rect.Height);
@@ -89,7 +97,7 @@ public class TagCloudBuilderTest
     {
         var sameFreq = new Dictionary<string, int> { ["короткое"] = 100, ["очень_длинное_слово"] = 100 };
 
-        var result = _builder.BuildTagCloud(2, sameFreq, 10, 500);
+        var result = _builder.GetTagCloud(sameFreq, 2, 10, 500);
 
         var shortWidth = result[0].rect.Width;
         var longWidth = result[1].rect.Width;

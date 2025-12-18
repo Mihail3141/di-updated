@@ -1,9 +1,10 @@
-﻿using System.Drawing;
-
-namespace TagsCloudContainer.TagBuilder;
+﻿namespace TagsCloudContainer.TagBuilder;
 
 public interface ITagCloudBuilder
 {
-    public List<Tag> BuildTagCloud(int tagCount, Dictionary<string, int> frequency,
-        int minFontSize, int maxFontSize);
+    public List<Tag> GetTagCloud(
+        Dictionary<string, int> frequency,
+        int? tagCount,
+        int minFontSize,
+        int maxFontSize);
 }

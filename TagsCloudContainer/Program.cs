@@ -59,10 +59,11 @@ public static class Program
             .ToDictionary(g => g.Key, g => g.Count());
         
 
-        var tags = builder.BuildTagCloud(90, frequency, 10, 90);
+        var tags = builder.GetTagCloud(frequency, 120, 10, 90);
         
-        var outputPath = Path.Combine(AppContext.BaseDirectory, "tagcloud.png");
         using var bitmap = renderer.CreateRectangleCloud(tags);
+        
+        var outputPath = Path.Combine(AppContext.BaseDirectory, "tagCloud.png");
         bitmap.Save(outputPath, System.Drawing.Imaging.ImageFormat.Png);
         Console.WriteLine($"Облако сохранено: {outputPath}");
     }

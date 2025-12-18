@@ -23,16 +23,15 @@ public class TagCloudRenderer : ICloudRenderer
         
         using var bgBrush = new SolidBrush(_settings.BackgroundColor);
         graphics.FillRectangle(bgBrush, 0, 0, _settings.ImageSize.Width, _settings.ImageSize.Height);
-
+        float fontSize;
         foreach (var tag in tags)
         {
-            var fontSize = tag.rect.Height * _settings.FontSizeMultiplier;
-            var font = new Font(_settings.FontName, fontSize, _settings.FontStyle);
+            fontSize = tag.rect.Height * _settings.FontSizeMultiplier;
+            using var font = new Font(_settings.FontName, fontSize, _settings.FontStyle);
             using var textBrush = new SolidBrush(_settings.TextColor);
             graphics.DrawString(tag.word, font, textBrush, tag.rect.X, tag.rect.Y);
-            font.Dispose();
-            // using var rectPen = new Pen(Color.FromArgb(120, 255, 255, 0), 1.5f);
-            // graphics.DrawRectangle(rectPen, tag.rect);
+            using var rectPen = new Pen(Color.FromArgb(120, 255, 255, 0), 1.5f);
+            graphics.DrawRectangle(rectPen, tag.rect);
         }
 
         return bitmap;
