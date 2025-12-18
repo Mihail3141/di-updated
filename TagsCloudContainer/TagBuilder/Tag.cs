@@ -1,6 +1,6 @@
 ﻿using System.Drawing;
 
-namespace TagsCloudContainer;
+namespace TagsCloudContainer.TagBuilder;
 
 public class Tag(string word, Rectangle rect)
 {

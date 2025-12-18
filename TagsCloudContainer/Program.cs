@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
 using Autofac;
+using TagsCloudContainer.Client;
 using TagsCloudContainer.Lemmatization;
 using TagsCloudContainer.TagBuilder;
 using TagsCloudContainer.TagsCloudVisualization.CircularCloudLayouter;
@@ -34,40 +35,18 @@ public static class Program
         builder.RegisterType<TagCloudBuilder>().As<ITagCloudBuilder>().SingleInstance();
         
         builder.RegisterType<TagCloudRenderer>().As<ICloudRenderer>().SingleInstance();
+        
+        builder.RegisterType<TagCloudService>().As<ITagCloudService>().SingleInstance();
+        
+        builder.RegisterType<ConsoleClient>().AsSelf().SingleInstance();
 
         return builder.Build();
     }
 
-    private static void Main()
+    private static int Main(string[] args)
     {
         using var container = CreateContainer();
-        using var scope = container.BeginLifetimeScope();
-
-        var reader = scope.Resolve<TextFileProcessor>();
-        var wordProcessor = scope.Resolve<WordProcessor>();
-        var builder = scope.Resolve<ITagCloudBuilder>();
-        var renderer = scope.Resolve<ICloudRenderer>();
-
-        var sourceFilePath = Path.Combine("..", "..", "..", "SourceFile", "ГарриПоттерНаРусском.txt");
-
-        var wordsFromText = reader.GetWordsFromFile(sourceFilePath);
-        var processedWords = wordProcessor
-            .SetAllowedPartsOfSpeech([PartsOfSpeech.Noun, PartsOfSpeech.Verb])
-            .ExcludeWords(["быть"])
-            .AddWordFilter(word => word.Lemma.Length > 2)
-            .Get(wordsFromText);
-        
-        var frequency = processedWords
-            .GroupBy(w => w)
-            .ToDictionary(g => g.Key, g => g.Count());
-        
-
-        var tags = builder.GetTagCloud(frequency, 150, 10, 90);
-        
-        using var bitmap = renderer.CreateRectangleCloud(tags);
-        
-        var outputPath = Path.Combine(AppContext.BaseDirectory, "tagCloud.png");
-        bitmap.Save(outputPath, System.Drawing.Imaging.ImageFormat.Png);
-        Console.WriteLine($"Облако сохранено: {outputPath}");
+        var client = container.Resolve<ConsoleClient>();
+        return client.Run(args);
     }
 }
