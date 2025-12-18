@@ -6,16 +6,11 @@ using System.Text.Json;
 
 namespace TagsCloudContainer.Lemmatization;
 
-public class MyStemAnalyzer
+public class MyStemAnalyzer : IStemAnalyzer
 {
-    private readonly string _systemPath;
+    private readonly string _systemPath = Path.Combine(AppContext.BaseDirectory, "mystem.exe");
     private readonly ConcurrentDictionary<string, List<MyStemWord>> _cache = new();
-
-    public MyStemAnalyzer(string systemPath)
-    {
-        _systemPath = systemPath ?? throw new ArgumentNullException(nameof(systemPath));
-    }
-
+    
 
     public List<MyStemWord> AnalyzeBatch(IEnumerable<string> words)
     {
@@ -33,7 +28,7 @@ public class MyStemAnalyzer
         }
 
         var newAnalysis = ProcessBatch(toProcess);
-        
+
         foreach (var word in toProcess)
         {
             var wordAnalysis = newAnalysis.Where(w => w.Text.Equals(word, StringComparison.OrdinalIgnoreCase)).ToList();
@@ -51,7 +46,7 @@ public class MyStemAnalyzer
         using var process = StartMyStemProcess();
         WriteInput(process, inputText);
         var output = ReadOutput(process, out _, out _);
-        
+
         return ParseOutput(output);
     }
 
@@ -105,9 +100,7 @@ public class MyStemAnalyzer
             if (!item.TryGetProperty("analysis", out var analysis) || analysis.GetArrayLength() == 0)
                 continue;
 
-
             var chosenAnalysis = analysis[0];
-
 
             if (!chosenAnalysis.TryGetProperty("lex", out var lex))
                 continue;

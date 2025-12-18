@@ -28,14 +28,11 @@ public class TagCloudRenderer : ICloudRenderer
         {
             var fontSize = tag.rect.Height * _settings.FontSizeMultiplier;
             var font = new Font(_settings.FontName, fontSize, _settings.FontStyle);
-            
-            var textSize = graphics.MeasureString(tag.word, font);
-            var textX = tag.rect.X + (tag.rect.Width - textSize.Width) / 2;
-            var textY = tag.rect.Y + (tag.rect.Height - textSize.Height) / 2;
-            
             using var textBrush = new SolidBrush(_settings.TextColor);
-            graphics.DrawString(tag.word, font, textBrush, textX, textY);
+            graphics.DrawString(tag.word, font, textBrush, tag.rect.X, tag.rect.Y);
             font.Dispose();
+            // using var rectPen = new Pen(Color.FromArgb(120, 255, 255, 0), 1.5f);
+            // graphics.DrawRectangle(rectPen, tag.rect);
         }
 
         return bitmap;

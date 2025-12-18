@@ -11,7 +11,7 @@ public class LemmatizationTest
     [SetUp]
     public void Setup()
     {
-        wordProcessor = new WordProcessor();
+        wordProcessor = new WordProcessor(new MyStemAnalyzer());
 
         words = ["красивые", "маме", "в", "под", "рамой", "мыла", "и", "он",];
     }

@@ -2,11 +2,15 @@
 
 public class WordProcessor
 {
-    private readonly MyStemAnalyzer _analyzer = new(Path.Combine(AppContext.BaseDirectory, "mystem.exe"));
-
-    private HashSet<string> _allowedPartsOfSpeech = new(StringComparer.OrdinalIgnoreCase) { "S", "A", "V"};
+    private readonly IStemAnalyzer _analyzer;
+    private HashSet<string> _allowedPartsOfSpeech = PartsOfSpeech.ContentWords;
     private HashSet<string> _excludedWords = new(StringComparer.OrdinalIgnoreCase);
     private readonly List<Func<MyStemWord, bool>> _filters = [];
+
+    public WordProcessor(IStemAnalyzer analyzer)
+    {
+        _analyzer = analyzer ?? throw new ArgumentNullException(nameof(analyzer));
+    }
 
     public WordProcessor SetAllowedPartsOfSpeech(IEnumerable<string> allowedPartsOfSpeech)
     {
@@ -30,7 +34,7 @@ public class WordProcessor
     {
         var batches = words
             .Where(word => !string.IsNullOrWhiteSpace(word))
-            .Chunk(100)
+            .Chunk(800)
             .ToList();
 
         var allAnalysis = new List<MyStemWord>();

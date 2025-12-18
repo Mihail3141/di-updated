@@ -2,6 +2,7 @@
 using FluentAssertions;
 using TagsCloudContainer;
 using TagsCloudContainer.TagBuilder;
+using TagsCloudContainer.TagsCloudVisualization.PointGenerator;
 using TagsCloudVisualization.CircularCloudLayouter;
 using TagsCloudVisualization.PointGenerator;
 

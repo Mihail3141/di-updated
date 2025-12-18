@@ -2,6 +2,7 @@
 using Autofac;
 using TagsCloudContainer.Lemmatization;
 using TagsCloudContainer.TagBuilder;
+using TagsCloudContainer.TagsCloudVisualization.PointGenerator;
 using TagsCloudContainer.TagsCloudVisualization.Render;
 using TagsCloudContainer.TextReader;
 using TagsCloudVisualization.CircularCloudLayouter;
@@ -16,12 +17,12 @@ public static class Program
         var builder = new ContainerBuilder();
         var center = new Point(1920 / 2, 1080 / 2);
         builder.RegisterType<TextFileProcessor>().AsSelf().SingleInstance();
+        builder.RegisterType<MyStemAnalyzer>().As<IStemAnalyzer>().SingleInstance();
+        builder.Register(ctx => new WordProcessor(ctx.Resolve<IStemAnalyzer>()));
         builder.Register(ctx =>
-            new WordProcessor());
+            new SpiralPointGenerator(new Point(700, 400)));
         builder.Register(ctx =>
-            new SpiralPointGenerator(center, 1, double.Pi / 24));
-        builder.Register(ctx =>
-                new CircularCloudLayouter(center, 20000, ctx.Resolve<SpiralPointGenerator>()))
+                new CircularCloudLayouter(center, 50000, ctx.Resolve<SpiralPointGenerator>()))
             .As<ICloudLayouter>().SingleInstance();
         builder.Register(ctx => new TagCloudBuilder(ctx.Resolve<ICloudLayouter>()))
             .As<ITagCloudBuilder>().SingleInstance();
@@ -54,7 +55,7 @@ public static class Program
 
         var wordsFromText = reader.GetWordsFromFile(sourceFilePath);
         var processedWords = wordProcessor
-            .SetAllowedPartsOfSpeech(["S", "V"])
+            .SetAllowedPartsOfSpeech([PartsOfSpeech.Noun, PartsOfSpeech.Verb])
             .ExcludeWords(["быть"])
             .AddWordFilter(word => word.Lemma.Length > 2)
             .Get(wordsFromText);
@@ -67,7 +68,7 @@ public static class Program
             .GroupBy(w => w)
             .ToDictionary(g => g.Key, g => g.Count());
         
-        var tags = builder.BuildTagCloud(100, frequency, 5, 120);
+        var tags = builder.BuildTagCloud(90, frequency, 20, 120);
         
         using var bitmap = renderer.CreateRectangleCloud(tags);
         bitmap.Save("tagcloud.png", System.Drawing.Imaging.ImageFormat.Png);
