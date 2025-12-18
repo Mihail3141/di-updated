@@ -39,14 +39,11 @@ public class WordProcessor
 
         var allAnalysis = new List<MyStemWord>();
 
-        Parallel.ForEach(batches, batch =>
+        foreach (var batch in batches)
         {
             var batchAnalysis = _analyzer.AnalyzeBatch(batch);
-            lock (allAnalysis)
-            {
-                allAnalysis.AddRange(batchAnalysis);
-            }
-        });
+            allAnalysis.AddRange(batchAnalysis);
+        }
 
         return allAnalysis
             .Where(w => _allowedPartsOfSpeech.Contains(w.Pos))

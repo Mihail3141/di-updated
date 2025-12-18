@@ -1,6 +1,8 @@
-﻿namespace TagsCloudContainer.TextReader;
+﻿using System.Text.RegularExpressions;
 
-public class TextFileProcessor
+namespace TagsCloudContainer.TextReader;
+
+public partial class TextFileProcessor
 {
     private static readonly char[] WordDelimiters =
     [
@@ -15,6 +17,8 @@ public class TextFileProcessor
         [".doc"] = new DocReader(),
         [".docx"] = new DocReader(),
     };
+    
+    private static readonly Regex WordNormalizer = MyRegex();
 
     public List<string> GetWordsFromFile(string pathToFile)
     {
@@ -30,6 +34,10 @@ public class TextFileProcessor
         return lines
             .SelectMany(line => line.Split(WordDelimiters, StringSplitOptions.RemoveEmptyEntries))
             .Where(word => !string.IsNullOrWhiteSpace(word))
+            .Select(word => WordNormalizer.Replace(word, "").ToLowerInvariant())
             .ToList();
     }
+
+    [GeneratedRegex(@"[^\p{L}]+", RegexOptions.Compiled)]
+    private static partial Regex MyRegex();
 }

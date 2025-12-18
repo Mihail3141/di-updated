@@ -6,9 +6,9 @@ namespace TagsCloudContainer.TagsCloudVisualization.Render;
 
 public class TagCloudRenderer : ICloudRenderer
 {
-    private readonly TagCloudRenderSettings _settings;
+    private readonly TagCloudSettings _settings;
 
-    public TagCloudRenderer(TagCloudRenderSettings settings)
+    public TagCloudRenderer(TagCloudSettings settings)
     {
         _settings = settings;
     }

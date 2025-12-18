@@ -3,6 +3,7 @@ using FluentAssertions;
 using TagsCloudContainer;
 using TagsCloudContainer.TagBuilder;
 using TagsCloudContainer.TagsCloudVisualization.PointGenerator;
+using TagsCloudContainer.TagsCloudVisualization.Render;
 using TagsCloudVisualization.CircularCloudLayouter;
 using TagsCloudVisualization.PointGenerator;
 
@@ -17,8 +18,7 @@ public class TagCloudBuilderTest
     [SetUp]
     public void Setup()
     {
-        var center = new Point(1920 / 2, 1080 / 2);
-        _layouter = new CircularCloudLayouter(center, 20000, new SpiralPointGenerator(center));
+        _layouter = new CircularCloudLayouter(new TagCloudSettings(), new SpiralPointGenerator(new TagCloudSettings()));
         _frequency = new Dictionary<string, int>
         {
             ["хогвартс"] = 500,

@@ -15,37 +15,31 @@ public static class Program
     private static IContainer CreateContainer()
     {
         var builder = new ContainerBuilder();
-        var center = new Point(1920 / 2, 1080 / 2);
+
+        builder.Register(_ => new TagCloudSettings()).AsSelf().SingleInstance();
+        
         builder.RegisterType<TextFileProcessor>().AsSelf().SingleInstance();
+
         builder.RegisterType<MyStemAnalyzer>().As<IStemAnalyzer>().SingleInstance();
-        builder.Register(ctx => new WordProcessor(ctx.Resolve<IStemAnalyzer>()));
-        builder.Register(ctx =>
-            new SpiralPointGenerator(new Point(700, 400)));
-        builder.Register(ctx =>
-                new CircularCloudLayouter(center, 50000, ctx.Resolve<SpiralPointGenerator>()))
-            .As<ICloudLayouter>().SingleInstance();
-        builder.Register(ctx => new TagCloudBuilder(ctx.Resolve<ICloudLayouter>()))
-            .As<ITagCloudBuilder>().SingleInstance();
-        builder.Register(ctx => new TagCloudRenderSettings
-            {
-                ImageSize = new Size(1920, 1080),
-                FontName = "Times New Roman",
-                FontStyle = FontStyle.Bold,
-                FontSizeMultiplier = 0.6f
-            })
-            .AsSelf().SingleInstance();
-        builder.Register(ctx =>
-                new TagCloudRenderer(ctx.Resolve<TagCloudRenderSettings>()))
-            .As<ICloudRenderer>().SingleInstance();
+
+        builder.RegisterType<WordProcessor>().AsSelf().SingleInstance();
+
+        builder.RegisterType<SpiralPointGenerator>().As<IPointGenerator>().SingleInstance();
+
+        builder.RegisterType<CircularCloudLayouter>().As<ICloudLayouter>().SingleInstance();
+
+        builder.RegisterType<TagCloudBuilder>().As<ITagCloudBuilder>().SingleInstance();
+        
+        builder.RegisterType<TagCloudRenderer>().As<ICloudRenderer>().SingleInstance();
 
         return builder.Build();
     }
 
     private static void Main()
     {
-        var container = CreateContainer();
+        using var container = CreateContainer();
         using var scope = container.BeginLifetimeScope();
-        
+
         var reader = scope.Resolve<TextFileProcessor>();
         var wordProcessor = scope.Resolve<WordProcessor>();
         var builder = scope.Resolve<ITagCloudBuilder>();
@@ -59,19 +53,17 @@ public static class Program
             .ExcludeWords(["быть"])
             .AddWordFilter(word => word.Lemma.Length > 2)
             .Get(wordsFromText);
-
-        // var sourceFileDir = Path.GetDirectoryName(sourceFilePath) ?? "SourceFile";
-        // var saver = new LemmasSaver(sourceFileDir);
-        // saver.SaveLemmas(result);
-
+        
         var frequency = processedWords
             .GroupBy(w => w)
             .ToDictionary(g => g.Key, g => g.Count());
         
-        var tags = builder.BuildTagCloud(90, frequency, 20, 120);
+
+        var tags = builder.BuildTagCloud(90, frequency, 10, 90);
         
+        var outputPath = Path.Combine(AppContext.BaseDirectory, "tagcloud.png");
         using var bitmap = renderer.CreateRectangleCloud(tags);
-        bitmap.Save("tagcloud.png", System.Drawing.Imaging.ImageFormat.Png);
-        Console.WriteLine("Облако сохранено: tagcloud.png");
+        bitmap.Save(outputPath, System.Drawing.Imaging.ImageFormat.Png);
+        Console.WriteLine($"Облако сохранено: {outputPath}");
     }
 }

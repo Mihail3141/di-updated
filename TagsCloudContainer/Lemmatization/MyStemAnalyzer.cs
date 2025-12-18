@@ -9,43 +9,61 @@ namespace TagsCloudContainer.Lemmatization;
 public class MyStemAnalyzer : IStemAnalyzer
 {
     private readonly string _systemPath = Path.Combine(AppContext.BaseDirectory, "mystem.exe");
+
     private readonly ConcurrentDictionary<string, List<MyStemWord>> _cache = new();
-    
+
 
     public List<MyStemWord> AnalyzeBatch(IEnumerable<string> words)
     {
-        var uniqueWords = words.Distinct(StringComparer.OrdinalIgnoreCase).ToHashSet();
-
-        var cached = new List<MyStemWord>();
+        var inputWords = words.ToList();
+        var uniqueWords = new HashSet<string>(inputWords, StringComparer.OrdinalIgnoreCase);
         var toProcess = new List<string>();
-
+        var cachedAnalysis = new List<MyStemWord>();
         foreach (var word in uniqueWords)
         {
-            if (_cache.TryGetValue(word, out var cachedAnalysis) && cachedAnalysis.Count != 0)
-                cached.AddRange(cachedAnalysis);
+            if (_cache.TryGetValue(word, out var cached) && cached.Count > 0)
+                cachedAnalysis.AddRange(cached);
             else
                 toProcess.Add(word);
         }
-
-        var newAnalysis = ProcessBatch(toProcess);
-
-        foreach (var word in toProcess)
+        
+        List<MyStemWord> newAnalysis = [];
+        if (toProcess.Count > 0)
         {
-            var wordAnalysis = newAnalysis.Where(w => w.Text.Equals(word, StringComparison.OrdinalIgnoreCase)).ToList();
-            _cache[word] = wordAnalysis;
+            newAnalysis = ProcessBatch(toProcess);
+            
+            foreach (var word in toProcess)
+            {
+                var wordAnalysis = newAnalysis
+                    .Where(w => w.Text.Equals(word, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+                _cache[word] = wordAnalysis;
+            }
         }
-
-        cached.AddRange(newAnalysis);
-        return cached;
+        
+        var allUniqueAnalysis = cachedAnalysis.Concat(newAnalysis).ToList();
+        var wordToAnalysis = allUniqueAnalysis
+            .GroupBy(w => w.Text.ToLowerInvariant())
+            .ToDictionary(g => g.Key, g => g.First());
+    
+        var result = new List<MyStemWord>();
+        foreach (var inputWord in inputWords)
+        {
+            var key = inputWord.ToLowerInvariant();
+            if (wordToAnalysis.TryGetValue(key, out var analysisResult))
+                result.Add(analysisResult);
+        }
+    
+        return result;
     }
 
-    private List<MyStemWord> ProcessBatch(List<string> words)
+    private List<MyStemWord> ProcessBatch(IEnumerable<string> words)
     {
         var inputText = string.Join("\n", words);
 
         using var process = StartMyStemProcess();
         WriteInput(process, inputText);
-        var output = ReadOutput(process, out _, out _);
+        var output = ReadOutput(process);
 
         return ParseOutput(output);
     }
@@ -78,12 +96,11 @@ public class MyStemAnalyzer : IStemAnalyzer
         writer.Close();
     }
 
-    private static string ReadOutput(Process process, out string stderr, out int exitCode)
+    private static string ReadOutput(Process process)
     {
         var output = process.StandardOutput.ReadToEnd();
-        stderr = process.StandardError.ReadToEnd();
+        process.StandardError.ReadToEnd();
         process.WaitForExit();
-        exitCode = process.ExitCode;
         return output;
     }
 

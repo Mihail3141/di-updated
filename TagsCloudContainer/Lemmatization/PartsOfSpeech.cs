@@ -9,9 +9,5 @@ public static class PartsOfSpeech
     public const string Conjunction = "CONJ";
     public const string Pronoun = "PR";
 
-    public static readonly HashSet<string> ContentWords =
-        new(StringComparer.OrdinalIgnoreCase)
-        {
-            Noun, Adjective, Verb
-        };
+    public static readonly HashSet<string> ContentWords = [Noun, Adjective, Verb];
 }

@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using TagsCloudContainer.TagsCloudVisualization.Render;
 using TagsCloudVisualization.CircularCloudLayouter;
 using TagsCloudVisualization.PointGenerator;
 
@@ -12,17 +13,13 @@ public class CircularCloudLayouter : ICloudLayouter
 
     private readonly int maxPointsPerRectangle;
 
-    public CircularCloudLayouter(Point center, int maxPointsPerRectangle, IPointGenerator pointGenerator)
+    public CircularCloudLayouter(TagCloudSettings settings, IPointGenerator pointGenerator)
     {
         ArgumentNullException.ThrowIfNull(pointGenerator);
+        ArgumentNullException.ThrowIfNull(settings);
 
-        if (center.X <= 0 || center.Y <= 0)
-            throw new ArgumentException("Center should be greater than 0");
 
-        if (maxPointsPerRectangle <= 0)
-            throw new ArgumentException("maxPointsPerRectangle must be greater than 0");
-
-        this.maxPointsPerRectangle = maxPointsPerRectangle;
+        maxPointsPerRectangle = settings.MaxPointsPerRectangle;
         this.pointGenerator = pointGenerator;
     }
 
