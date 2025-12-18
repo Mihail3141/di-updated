@@ -2,10 +2,9 @@
 using FluentAssertions;
 using TagsCloudContainer;
 using TagsCloudContainer.TagBuilder;
+using TagsCloudContainer.TagsCloudVisualization.CircularCloudLayouter;
 using TagsCloudContainer.TagsCloudVisualization.PointGenerator;
 using TagsCloudContainer.TagsCloudVisualization.Render;
-using TagsCloudVisualization.CircularCloudLayouter;
-using TagsCloudVisualization.PointGenerator;
 
 namespace TagsCloudContainerTest;
 

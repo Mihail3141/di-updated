@@ -1,6 +1,6 @@
 ﻿using System.Drawing;
 
-namespace TagsCloudVisualization.PointGenerator;
+namespace TagsCloudContainer.TagsCloudVisualization.PointGenerator;
 
 public interface IPointGenerator
 {

@@ -1,26 +1,26 @@
 ﻿using System.Drawing;
+using TagsCloudContainer.TagsCloudVisualization.PointGenerator;
 using TagsCloudContainer.TagsCloudVisualization.Render;
-using TagsCloudVisualization.CircularCloudLayouter;
-using TagsCloudVisualization.PointGenerator;
 
-namespace TagsCloudContainer;
+namespace TagsCloudContainer.TagsCloudVisualization.CircularCloudLayouter;
 
 public class CircularCloudLayouter : ICloudLayouter
 {
-    private readonly List<Rectangle> rectangles = [];
+    private readonly List<Rectangle> _rectangles = [];
 
-    private readonly IPointGenerator pointGenerator;
+    private readonly IPointGenerator _pointGenerator;
 
-    private readonly int maxPointsPerRectangle;
+    private readonly int _maxPointsPerRectangle;
+
+    private Rectangle _candidateRect;
 
     public CircularCloudLayouter(TagCloudSettings settings, IPointGenerator pointGenerator)
     {
         ArgumentNullException.ThrowIfNull(pointGenerator);
         ArgumentNullException.ThrowIfNull(settings);
 
-
-        maxPointsPerRectangle = settings.MaxPointsPerRectangle;
-        this.pointGenerator = pointGenerator;
+        _maxPointsPerRectangle = settings.MaxPointsPerRectangle;
+        _pointGenerator = pointGenerator;
     }
 
 
@@ -29,25 +29,33 @@ public class CircularCloudLayouter : ICloudLayouter
         if (rectangleSize.Width <= 0 || rectangleSize.Height <= 0)
             throw new ArgumentException("Rectangle size must be positive");
 
-        var points = pointGenerator
+        var points = _pointGenerator
             .GetPoints()
-            .Take(maxPointsPerRectangle);
+            .Take(_maxPointsPerRectangle);
 
 
         foreach (var point in points)
         {
-            var rectangle = new Rectangle(point, rectangleSize);
-            for (var i = rectangles.Count - 1; i >= 0; i--)
+            _candidateRect.Location = point;
+            _candidateRect.Size = rectangleSize;
+
+            var hasIntersects = false;
+            for (var i = _rectangles.Count - 1; i >= 0; i--)
             {
-                if (rectangles[i].IntersectsWith(rectangle))
-                    goto NextPoint;
+                if (!_rectangles[i].IntersectsWith(_candidateRect))
+                    continue;
+                hasIntersects = true;
+                break;
             }
 
-            rectangles.Add(rectangle);
-            return rectangle;
-            NextPoint: ;
+            if (hasIntersects)
+                continue;
+
+            var findRect = new Rectangle(point, rectangleSize);
+            _rectangles.Add(findRect);
+            return findRect;
         }
 
-        throw new ArgumentException($"Failed to find place for the {rectangles.Count} rectangle");
+        throw new ArgumentException($"Failed to find place for the {_rectangles.Count} rectangle");
     }
 }

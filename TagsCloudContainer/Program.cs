@@ -2,11 +2,10 @@
 using Autofac;
 using TagsCloudContainer.Lemmatization;
 using TagsCloudContainer.TagBuilder;
+using TagsCloudContainer.TagsCloudVisualization.CircularCloudLayouter;
 using TagsCloudContainer.TagsCloudVisualization.PointGenerator;
 using TagsCloudContainer.TagsCloudVisualization.Render;
 using TagsCloudContainer.TextReader;
-using TagsCloudVisualization.CircularCloudLayouter;
-using TagsCloudVisualization.PointGenerator;
 
 namespace TagsCloudContainer;
 
@@ -17,6 +16,10 @@ public static class Program
         var builder = new ContainerBuilder();
 
         builder.Register(_ => new TagCloudSettings()).AsSelf().SingleInstance();
+        
+        builder.RegisterType<TxtReader>().As<ITextReader>().SingleInstance();
+        
+        builder.RegisterType<DocReader>().As<ITextReader>().SingleInstance();
         
         builder.RegisterType<TextFileProcessor>().AsSelf().SingleInstance();
 
@@ -59,7 +62,7 @@ public static class Program
             .ToDictionary(g => g.Key, g => g.Count());
         
 
-        var tags = builder.GetTagCloud(frequency, 120, 10, 90);
+        var tags = builder.GetTagCloud(frequency, 150, 10, 90);
         
         using var bitmap = renderer.CreateRectangleCloud(tags);
         
